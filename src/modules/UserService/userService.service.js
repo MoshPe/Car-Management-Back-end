@@ -18,8 +18,6 @@ const login = async (req, res) => {
   }
 
   if (!authenticated) {
-    req.session.authenticated = true;
-
     const isExist = await dbs.usersCollection.findOne({
       email: email,
     });
@@ -30,11 +28,11 @@ const login = async (req, res) => {
         message: `User doesn't exist`,
       });
     }
-
-    bcrypt.compare(password, isExist.password, function (err, result) {
-      if (result) res.send('Successfully authenticated');
-      else res.send('Password incorrect');
-    });
+    const result = bcrypt.compareSync(password, isExist.password);
+    if (result) {
+      req.session.authenticated = true;
+      res.send('Successfully authenticated');
+    } else res.send('Password incorrect');
   } else {
     res.send('Already authenticated');
   }
@@ -51,15 +49,16 @@ const forgetPassword = async (req, res) => {};
 const signup = async (req, res) => {
   const user = req.body;
 
-  if (!user) {
+  if (!user || Object.keys(user).length === 0) {
     return res.status(404).json({
       success: false,
-      message: 'You must provide a treatment',
+      message: 'You must provide a user',
     });
   }
-  await bcrypt.hash(user.password, saltRounds, function (hash) {
-    user.password = hash;
-  });
+
+  const salt = bcrypt.genSaltSync(saltRounds);
+  const hash = bcrypt.hashSync(user.password, salt);
+  user.password = hash;
 
   const isExist = await dbs.usersCollection.findOne({
     email: user.email,
@@ -77,14 +76,14 @@ const signup = async (req, res) => {
     .then((result) => {
       return res.status(201).json({
         success: true,
-        message: 'A new treatment has been registered',
+        message: 'A new user has been signed up',
         result,
       });
     })
     .catch((e) => {
-      return res.status(201).json({
+      return res.status(400).json({
         success: false,
-        message: `Couldn't insert new treatment`,
+        message: `Couldn't sign up new user`,
         user: user,
         e,
       });
