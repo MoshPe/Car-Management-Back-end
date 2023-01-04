@@ -13,6 +13,7 @@ const getAllTreatments = async (req, res) => {
     const { [name]: removedProperty, ...treatment } = doc;
     treatments.push(treatment);
   };
+  
   await allTreatments.forEach(treatmentsIterator);
 
   return res.status(200).json({
@@ -62,7 +63,6 @@ const editTreatment = async (req, res) => {
 
 const deleteTreatment = async (req, res) => {
   const treatmentNumber = req.query['treatmentNumber'];
-
   const isExist = await dbs.treatmentsCollection.findOne({
     Treatment_Number: ObjectId(treatmentNumber),
   });

@@ -4,7 +4,7 @@ const verifyJWT = require('../middleware/verifyJWT');
 
 const treatments = express.Router();
 
-treatments.use(verifyJWT);
+// treatments.use(verifyJWT);
 
 treatments.post('/treatment/create', dashboard.addTreatment);
 treatments.get('/treatments', dashboard.getAllTreatments);
