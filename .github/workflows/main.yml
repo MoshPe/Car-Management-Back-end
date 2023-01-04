@@ -45,4 +45,4 @@ jobs:
         uses: denoland/deployctl@v1
         with:
           project: car-management-app # the name of the project on Deno Deploy
-          entrypoint: src/app.js # the entrypoint to deploy
+          entrypoint: app.js # the entrypoint to deploy
