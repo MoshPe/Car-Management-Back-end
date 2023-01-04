@@ -1,0 +1,48 @@
+on:
+  push:
+    branches: [ "server" ]
+  workflow_dispatch:
+
+env:
+ NODE_VERSION: '18.x'                # set this to the node version to use
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: npm install, build, and test
+      run: |
+        npm install
+
+#     - name: Upload artifact for deployment job
+#       uses: actions/upload-artifact@v3
+#       with:
+#         name: node-app
+#         path: .
+
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # This is required to allow the GitHub Action to authenticate with Deno Deploy.
+      contents: read
+    needs: build
+
+    steps:
+      - name: Upload artifact for deployment job
+        uses: actions/checkout@v3
+      - name: Deploy to Deno Deploy
+        uses: denoland/deployctl@v1
+        with:
+          project: car-management-app # the name of the project on Deno Deploy
+          entrypoint: app.js # the entrypoint to deploy
