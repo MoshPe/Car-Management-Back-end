@@ -4,6 +4,7 @@
   "description": "Express server - Node.js with Javascript",
   "main": "src/app.js",
   "scripts": {
+    "start": "node src/app.js",
     "dev": "nodemon src/app.js",
     "test": "jest",
     "test:unit": "jest unit",
