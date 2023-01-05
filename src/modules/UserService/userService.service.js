@@ -6,8 +6,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const User = require('../../models/user');
-const CarTreatments = require('../../models/car_treatment');
-// const { subtle } = require('crypto');
+const crypto = require('crypto');
+const transporter = require('../mail/transporter');
 
 const login = async (req, res) => {
   let { email, password } = req.body;
@@ -95,13 +95,13 @@ const forgetPassword = async (req, res) => {
   if (!email) {
     return res.status(404).json({
       success: false,
-      message: 'You must provide a user credentials',
+      message: 'You must provide a user email',
     });
   }
 
   const isExist = await User.findOne({
     email: email,
-  });
+  }).exec();
 
   if (!isExist) {
     return res.status(404).json({
@@ -109,6 +109,39 @@ const forgetPassword = async (req, res) => {
       message: `User doesn't exist`,
     });
   }
+  console.log(crypto.randomBytes(32).toString('hex'));
+
+  const mailOptions = {
+    from: 'moshe.peretz318@gmail.com',
+    to: email,
+    subject: 'test Email',
+    text: 'For clients with plaintext support only',
+    html: `<!doctype html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <style amp4email-boilerplate>body{visibility:hidden}</style>
+        <script async src="https://cdn.ampproject.org/v0.js"></script>
+        <script async custom-element="amp-anim" src="https://cdn.ampproject.org/v0/amp-anim-0.1.js"></script>
+      </head>
+      <body>
+        <p>Image: <amp-img src="https://cldup.com/P0b1bUmEet.png" width="16" height="16"/></p>
+        <p>GIF (requires "amp-anim" script in header):<br/>
+          <amp-anim src="https://cldup.com/D72zpdwI-i.gif" width="500" height="350"/></p>
+      </body>
+    </html>`,
+  };
+
+  await transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Email sent: ' + info.response);
+      // do something useful
+    }
+  });
+
+  return res.sendStatus(200);
 };
 
 const signup = async (req, res) => {

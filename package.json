@@ -56,7 +56,9 @@
     "mongoose": "^6.8.2",
     "morgan": "^1.10.0",
     "nodemailer": "^6.8.0",
+    "nodemailer-smtp-transport": "^2.7.4",
     "response-time": "^2.3.2",
+    "strapi-provider-email-nodemailer": "^3.6.11",
     "winston": "^3.8.2"
   },
   "config": {
