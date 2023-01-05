@@ -10,9 +10,15 @@ const responseTime = require('response-time');
 const cors = require('cors');
 const helmet = require('helmet');
 const verifyJWT = require('./middleware/verifyJWT');
+const connectDB = require('./modules/database/mongodb');
+const { connection } = require('mongoose');
+const mongoose = require('mongoose');
 
 const app = express();
 app.set('port', process.env.PORT || 4000);
+
+mongoose.set('strictQuery', true);
+connectDB();
 
 app.use(responseTime());
 app.use(credentials);
@@ -41,7 +47,9 @@ app.use('/api', require('./api/refresh'));
 
 // app.use(verifyJWT);
 app.use('/api', require('./api/treatments'));
-
-app.listen(app.get('port'), () => {
-  console.log(`App listening on ${app.get('port')}`);
+connection.once('open', () => {
+  console.log('Connected to MongoDB');
+  app.listen(app.get('port'), () => {
+    console.log(`App listening on ${app.get('port')}`);
+  });
 });

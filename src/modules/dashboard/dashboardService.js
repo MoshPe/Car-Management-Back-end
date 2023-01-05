@@ -2,24 +2,20 @@ require('console-stamp')(console, {
   format: ':date(yyyy/mm/dd HH:MM:ss.l) :label',
 });
 const dbs = require('../database/mongodb');
+const CarTreatments = require('../../models/car_treatment');
 const { ObjectId } = require('mongodb');
 
 const name = '_id';
 
 const getAllTreatments = async (req, res) => {
-  const allTreatments = await dbs.treatmentsCollection.find();
-  const treatments = [];
-  const treatmentsIterator = (doc) => {
-    const { [name]: removedProperty, ...treatment } = doc;
-    treatments.push(treatment);
-  };
-  
-  await allTreatments.forEach(treatmentsIterator);
+  const allTreatments = await CarTreatments.find()
+    .select({ _id: 0, __v: 0 })
+    .exec();
 
   return res.status(200).json({
     success: true,
     message: 'All treatments data has been fetched',
-    data: treatments,
+    data: allTreatments,
   });
 };
 
@@ -28,15 +24,15 @@ const editTreatment = async (req, res) => {
   const treatmentNumber = req.query['treatmentNumber'];
 
   if (!treatment || !treatmentNumber) {
-    return res.status(404).json({
+    return res.status(400).json({
       success: false,
       message: 'You must provide a treatment',
     });
   }
 
-  const isExist = await dbs.treatmentsCollection.findOne({
+  let isExist = await CarTreatments.findOne({
     Treatment_Number: ObjectId(treatmentNumber),
-  });
+  }).exec();
 
   if (!isExist) {
     return res.status(404).json({
@@ -45,51 +41,56 @@ const editTreatment = async (req, res) => {
     });
   }
 
-  dbs.treatmentsCollection
-    .updateOne({ _id: ObjectId(treatmentNumber) }, { $set: treatment })
+  await CarTreatments.updateOne(
+    { _id: ObjectId(treatmentNumber) },
+    { $set: treatment }
+  )
+    .exec()
     .then((result) => {
-      return res.status(200).json({
-        success: true,
-        message: `A new treatment with id ${treatmentNumber} has been successfully updated`,
+      if (result.modifiedCount === 1)
+        return res.status(200).json({
+          success: true,
+          message: `Treatment with Treatment Number ${treatmentNumber} has been successfully updated`,
+        });
+      return res.status(500).json({
+        success: false,
+        message: `Treatment with Treatment Number ${treatmentNumber} couldn't be updated`,
       });
     })
     .catch((e) => {
-      return res.status(200).json({
+      return res.status(500).json({
         success: false,
-        message: `Couldn't update treatment id ${treatmentNumber}`,
+        message: `Couldn't update treatment with Treatment Number ${treatmentNumber}`,
+        error: e,
       });
     });
 };
 
 const deleteTreatment = async (req, res) => {
   const treatmentNumber = req.query['treatmentNumber'];
-  const isExist = await dbs.treatmentsCollection.findOne({
-    Treatment_Number: ObjectId(treatmentNumber),
-  });
 
-  if (!isExist) {
+  if (!treatmentNumber)
+    return res
+      .status(400)
+      .json({ 'Treatment Number': 'Treatment Number required' });
+
+  const treatment = await CarTreatments.findOne({
+    Treatment_Number: ObjectId(treatmentNumber),
+  }).exec();
+
+  if (!treatment) {
     return res.status(404).json({
       success: false,
-      message: `Treatment doesn't exist`,
+      message: `Treatment with number ${treatmentNumber} doesn't exist`,
     });
   }
 
-  dbs.treatmentsCollection
-    .deleteOne({ _id: ObjectId(treatmentNumber) })
-    .then((result) => {
-      console.log(result);
-      return res.status(200).json({
-        success: true,
-        message: `Successfully deleted treatment with id ${treatmentNumber}`,
-      });
-    })
-    .catch((e) => {
-      console.log(e);
-      return res.status(200).json({
-        success: false,
-        message: `Unsuccessful in deleting treatment with id ${treatmentNumber}`,
-      });
-    });
+  const result = await treatment.deleteOne();
+  return res.status(200).json({
+    success: true,
+    message: `Successfully deleted treatment with Treatment Number ${treatmentNumber}`,
+    result,
+  });
 };
 
 const addTreatment = async (req, res) => {
@@ -102,7 +103,7 @@ const addTreatment = async (req, res) => {
     });
   }
 
-  const isExist = await dbs.treatmentsCollection.findOne({
+  const isExist = await CarTreatments.findOne({
     Treatment_Information: treatment.Treatment_Information,
     Date: treatment.Date,
     Worker_email: treatment.Worker_email,
@@ -110,34 +111,27 @@ const addTreatment = async (req, res) => {
   });
 
   if (isExist) {
-    return res.status(404).json({
+    return res.status(409).json({
       success: false,
       message: 'Treatment already exist',
     });
   }
-
-  dbs.treatmentsCollection
-    .insertOne(treatment)
-    .then((result) => {
-      console.log(result);
-      dbs.treatmentsCollection.updateOne(
-        { _id: result.insertedId },
-        { $set: { Treatment_Number: result.insertedId } }
-      );
-      return res.status(201).json({
-        success: true,
-        message: 'A new treatment has been registered',
-        result,
-      });
-    })
-    .catch((e) => {
-      return res.status(201).json({
-        success: false,
-        message: `Couldn't insert new treatment`,
-        treatment: treatment,
-        e,
-      });
+  treatment.Treatment_Number = new ObjectId();
+  try {
+    const result = await CarTreatments.create(treatment);
+    return res.status(201).json({
+      success: true,
+      message: 'A new treatment has been registered',
+      result,
     });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: `Couldn't insert new treatment`,
+      treatment: treatment,
+      error,
+    });
+  }
 };
 
 module.exports = {
