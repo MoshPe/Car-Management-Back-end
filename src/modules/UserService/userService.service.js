@@ -2,9 +2,11 @@ require('console-stamp')(console, {
   format: ':date(yyyy/mm/dd HH:MM:ss.l) :label',
 });
 
-const dbs = require('../database/mongodb');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+
+const User = require('../../models/user');
+const CarTreatments = require('../../models/car_treatment');
 // const { subtle } = require('crypto');
 
 const login = async (req, res) => {
@@ -16,9 +18,9 @@ const login = async (req, res) => {
     });
   }
 
-  const foundUser = await dbs.usersCollection.findOne({
+  const foundUser = await User.findOne({
     email: email,
-  });
+  }).exec();
 
   if (!foundUser) {
     return res.status(401).json({
@@ -26,7 +28,7 @@ const login = async (req, res) => {
       message: `User doesn't exist`,
     });
   }
-  const result = bcrypt.compareSync(password, foundUser.password);
+  const result = await bcrypt.compareSync(password, foundUser.password);
   if (result) {
     const accessToken = jwt.sign(
       {
@@ -43,12 +45,7 @@ const login = async (req, res) => {
       { expiresIn: '1d' }
     );
     foundUser.refreshToken = refreshToken;
-    const result = await dbs.usersCollection.updateOne(
-      { email: foundUser.email },
-      {
-        $set: foundUser,
-      }
-    );
+    const result = await foundUser.save();
 
     console.log(result);
 
@@ -69,10 +66,10 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
   const cookies = req.cookies;
-  if (!cookies?.jwt) return res.sendStatus(204); //No content
+  // if (!cookies?.jwt) return res.sendStatus(204); //No content
   const refreshToken = cookies.jwt;
 
-  const foundUser = await dbs.usersCollection.findOne({ refreshToken });
+  const foundUser = await User.findOne({ refreshToken }).exec();
   if (!foundUser) {
     res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
     return res.status(204).json({
@@ -81,13 +78,9 @@ const logout = async (req, res) => {
     });
   }
 
-  foundUser.refreshToken = '';
-  const result = await dbs.usersCollection.updateOne(
-    { email: foundUser.email },
-    {
-      $set: foundUser,
-    }
-  );
+  foundUser.refreshToken = 'NO_TOKEN';
+  const result = await foundUser.save();
+
   console.log(result);
 
   res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
@@ -106,7 +99,7 @@ const forgetPassword = async (req, res) => {
     });
   }
 
-  const isExist = await dbs.usersCollection.findOne({
+  const isExist = await User.findOne({
     email: email,
   });
 
@@ -128,9 +121,9 @@ const signup = async (req, res) => {
     });
   }
 
-  const isExist = await dbs.usersCollection.findOne({
+  const isExist = await User.findOne({
     email: user.email,
-  });
+  }).exec();
 
   if (isExist) {
     return res.status(409).json({
@@ -141,23 +134,21 @@ const signup = async (req, res) => {
   const hashedPwd = await bcrypt.hash(user.password, 10);
   user.password = hashedPwd;
 
-  dbs.usersCollection
-    .insertOne(user)
-    .then((result) => {
-      return res.status(201).json({
-        success: true,
-        message: `A new user ${user.email} has been signed up`,
-        result,
-      });
-    })
-    .catch((e) => {
-      return res.status(500).json({
-        success: false,
-        message: `Couldn't sign up new user`,
-        user: user,
-        e,
-      });
+  try {
+    const result = await User.create(user);
+    return res.status(201).json({
+      success: true,
+      message: `A new user ${user.email} has been signed up`,
+      result,
     });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: `Couldn't sign up new user`,
+      user: user,
+      error,
+    });
+  }
 };
 
 const refreshToken = async (req, res) => {
@@ -165,7 +156,7 @@ const refreshToken = async (req, res) => {
   if (!cookies?.jwt) return res.sendStatus(401);
   const refreshToken = cookies.jwt;
 
-  const foundUser = await dbs.usersCollection.findOne({ refreshToken });
+  const foundUser = await User.findOne({ refreshToken }).exec();
   if (!foundUser) {
     return res.status(403).json({
       success: false,

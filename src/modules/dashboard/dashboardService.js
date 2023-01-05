@@ -1,11 +1,8 @@
 require('console-stamp')(console, {
   format: ':date(yyyy/mm/dd HH:MM:ss.l) :label',
 });
-const dbs = require('../database/mongodb');
 const CarTreatments = require('../../models/car_treatment');
 const { ObjectId } = require('mongodb');
-
-const name = '_id';
 
 const getAllTreatments = async (req, res) => {
   const allTreatments = await CarTreatments.find()
