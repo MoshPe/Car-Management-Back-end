@@ -99,37 +99,76 @@ const forgetPassword = async (req, res) => {
     });
   }
 
-  const isExist = await User.findOne({
+  const foundUser = await User.findOne({
     email: email,
   }).exec();
 
-  if (!isExist) {
+  if (!foundUser) {
     return res.status(404).json({
       success: false,
       message: `User doesn't exist`,
     });
   }
-  console.log(crypto.randomBytes(32).toString('hex'));
+  foundUser.password = crypto.randomBytes(32).toString('hex');
+  const result = await foundUser.save();
+
+  console.log(result);
 
   const mailOptions = {
     from: 'moshe.peretz318@gmail.com',
     to: email,
     subject: 'test Email',
     text: 'For clients with plaintext support only',
-    html: `<!doctype html>
+    html: `
+    <!DOCTYPE html>
     <html>
       <head>
-        <meta charset="utf-8">
-        <style amp4email-boilerplate>body{visibility:hidden}</style>
-        <script async src="https://cdn.ampproject.org/v0.js"></script>
-        <script async custom-element="amp-anim" src="https://cdn.ampproject.org/v0/amp-anim-0.1.js"></script>
+        <!-- HTML Codes by Quackit.com -->
+        <title>
+        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+        body {background-color:#ffffff;background-repeat:no-repeat;background-position:top left;background-attachment:fixed;}
+        h1{font-family:Arial, sans-serif;color:#000000;background-color:#ffffff;}
+        p {font-family:Georgia, serif;font-size:14px;font-style:normal;font-weight:normal;color:#000000;background-color:#ffffff;}
+        .button {
+          border: none;
+          color: white;
+          padding: 16px 32px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          font-size: 16px;
+          margin: 4px 2px;
+          transition-duration: 0.4s;
+          cursor: pointer;
+        }
+        
+        .button1 {
+          background-color: white; 
+          color: black; 
+          border: 2px solid #4CAF50;
+        }
+        
+        .button1:hover {
+          background-color: #4CAF50;
+          color: white;
+        }
+        </style>
       </head>
       <body>
-        <p>Image: <amp-img src="https://cldup.com/P0b1bUmEet.png" width="16" height="16"/></p>
-        <p>GIF (requires "amp-anim" script in header):<br/>
-          <amp-anim src="https://cldup.com/D72zpdwI-i.gif" width="500" height="350"/></p>
+        <h1>Reset Password - Car Management Service</h1>
+        <p></p>
+        <p>Hey there,</p>
+        <p></p>
+        <p>Someone requested a new password for your [customer portal] account.</p>
+        <p></p>
+        <button class="button button1">reset password</button>
+        <p></p>
+        <p>If you didn’t make this request, then you can ignore this email 🙂</p>
       </body>
-    </html>`,
+    </html>
+  `,
   };
 
   await transporter.sendMail(mailOptions, (error, info) => {
