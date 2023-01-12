@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../../models/user');
 const crypto = require('crypto');
 const transporter = require('../mail/transporter');
+const nodemailer = require('nodemailer');
 
 const login = async (req, res) => {
   let { email, password } = req.body;
@@ -114,8 +115,35 @@ const forgetPassword = async (req, res) => {
 
   console.log(result);
 
+  const transporter = nodemailer.createTransport({
+    port: 465,
+    service: 'gmail',
+    host: 'smtp.gmail.com',
+    auth: {
+      user: 'moshe.peretz318@gmail.com',
+      pass: process.env.SMTP_PASSWORD,
+    },
+    secure: true,
+  });
+
+  await new Promise((resolve, reject) => {
+    // verify connection configuration
+    transporter.verify(function (error, success) {
+      if (error) {
+        console.log(error);
+        reject(error);
+      } else {
+        console.log('Server is ready to take our messages');
+        resolve(success);
+      }
+    });
+  });
+
   const mailOptions = {
-    from: 'moshe.peretz318@gmail.com',
+    from: {
+      name: `Car-Management Service - Reset password`,
+      address: 'moshe.peretz318@gmail.com',
+    },
     to: email,
     subject: 'test Email',
     text: 'For clients with plaintext support only',
@@ -171,13 +199,26 @@ const forgetPassword = async (req, res) => {
   `,
   };
 
-  await transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log('Email sent: ' + info.response);
-      // do something useful
-    }
+  // await transporter.sendMail(mailOptions, (error, info) => {
+  //   if (error) {
+  //     console.log(error);
+  //   } else {
+  //     console.log('Email sent: ' + info.response);
+  //     // do something useful
+  //   }
+  // });
+
+  await new Promise((resolve, reject) => {
+    // send mail
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.error(err);
+        reject(err);
+      } else {
+        console.log(info);
+        resolve(info);
+      }
+    });
   });
 
   return res.sendStatus(200);
