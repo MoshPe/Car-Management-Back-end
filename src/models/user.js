@@ -15,6 +15,7 @@ const UserSchema = new mongoose.Schema(
     },
   },
   {
+    strict: false,
     versionKey: false,
   }
 );

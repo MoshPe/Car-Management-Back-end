@@ -151,7 +151,6 @@ const forgetPassword = async (req, res) => {
     <!DOCTYPE html>
     <html>
       <head>
-        <!-- HTML Codes by Quackit.com -->
         <title>
         </title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -199,15 +198,6 @@ const forgetPassword = async (req, res) => {
   `,
   };
 
-  // await transporter.sendMail(mailOptions, (error, info) => {
-  //   if (error) {
-  //     console.log(error);
-  //   } else {
-  //     console.log('Email sent: ' + info.response);
-  //     // do something useful
-  //   }
-  // });
-
   await new Promise((resolve, reject) => {
     // send mail
     transporter.sendMail(mailOptions, (err, info) => {
@@ -244,8 +234,8 @@ const signup = async (req, res) => {
       message: 'User already exist',
     });
   }
-  const hashedPwd = await bcrypt.hash(user.password, 10);
-  user.password = hashedPwd;
+
+  user.password = await bcrypt.hash(user.password, 10);
 
   try {
     const result = await User.create(user);
