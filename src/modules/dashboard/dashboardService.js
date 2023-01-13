@@ -39,7 +39,7 @@ const editTreatment = async (req, res) => {
   }
 
   await CarTreatments.updateOne(
-    { _id: ObjectId(treatmentNumber) },
+    { Treatment_Number: ObjectId(treatmentNumber) },
     { $set: treatment }
   )
     .exec()
