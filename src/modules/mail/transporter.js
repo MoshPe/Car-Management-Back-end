@@ -6,7 +6,7 @@ const sendEmail = async (mailOptions) => {
     service: 'gmail',
     host: 'smtp.gmail.com',
     auth: {
-      user: 'moshe.peretz318@gmail.com',
+      user: process.env.SMTP_USERNAME,
       pass: process.env.SMTP_PASSWORD,
     },
     secure: true,

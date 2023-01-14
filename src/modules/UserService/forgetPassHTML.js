@@ -48,7 +48,6 @@ const forgetPass = (path) => {
   <p>To reset your password, visit the following address:</p>
 
   <a type="button" class="button" href='https://car-managment-tm.vercel.app/ResetPassword/${path}'>Click here to reset your password</a>
-<!--  <button>Click here to reset your password</button>-->
   <p> This link is available for 5 minuntes only! </p>
   <p>
     If you didn't request a password reset, you can ignore this email. Your

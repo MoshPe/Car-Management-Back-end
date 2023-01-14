@@ -134,11 +134,10 @@ const forgetPassword = async (req, res) => {
   const mailOptions = {
     from: {
       name: `Car-Management Service - Reset password`,
-      address: 'moshe.peretz318@gmail.com',
+      address: process.env.SMTP_USERNAME,
     },
     to: email,
-    subject: 'test Email',
-    text: 'For clients with plaintext support only',
+    subject: 'Reset Password',
     html: forgetPassHtml(resetPass),
   };
 
@@ -230,9 +229,9 @@ const contactUs = async (req, res) => {
   const mailOptions = {
     from: {
       name: `Contact us - from ${email}`,
-      address: 'moshe.peretz318@gmail.com',
+      address: process.env.SMTP_USERNAME,
     },
-    to: 'moshe.peretz318@gmail.com',
+    to: process.env.SMTP_USERNAME,
     subject: `Contact us - from ${email} - ${contactInfo.name} - ${contactInfo?.subject}`,
     text: contactInfo?.body,
   };
