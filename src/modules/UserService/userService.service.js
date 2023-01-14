@@ -60,6 +60,7 @@ const login = async (req, res) => {
     res.status(200).json({
       success: true,
       message: 'Successfully authenticated',
+      foundUser,
       accessToken,
     });
   } else
