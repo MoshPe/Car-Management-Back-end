@@ -62,7 +62,11 @@ const login = async (req, res) => {
       message: 'Successfully authenticated',
       accessToken,
     });
-  } else res.status(401).send('Password incorrect');
+  } else
+    res.status(401).json({
+      success: false,
+      message: `Password Incorrect`,
+    });
 };
 
 const logout = async (req, res) => {
@@ -147,7 +151,11 @@ const resetPassword = async (req, res) => {
   const { password } = req.body;
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, decoded) => {
-    if (err) return res.sendStatus(403); //invalid token
+    if (err)
+      return res.status(403).json({
+        success: false,
+        message: `Invalid Token`,
+      }); //invalid token
     const email = decoded.UserInfo.email;
     const foundUser = await User.findOne({
       email: email,

@@ -47,7 +47,7 @@ const forgetPass = (path) => {
 
   <p>To reset your password, visit the following address:</p>
 
-  <a type="button" class="button" href='https://localhost:3000/ResetPassword/${path}'>Click here to reset your password</a>
+  <a type="button" class="button" href='http://localhost:3000/ResetPassword/${path}'>Click here to reset your password</a>
 <!--  <button>Click here to reset your password</button>-->
   <p> This link is available for 5 minuntes only! </p>
   <p>
