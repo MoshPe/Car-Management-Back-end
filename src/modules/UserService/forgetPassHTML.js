@@ -22,6 +22,7 @@ const forgetPass = (path) => {
       }
       .button {
           text-decoration: none;
+          color: black;
           border: none;
           background: #65abfc;
           font-size: 17px;
