@@ -25,7 +25,7 @@ app.use(responseTime());
 app.use(credentials);
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 app.use(helmet());
 app.use(cookieParser());
