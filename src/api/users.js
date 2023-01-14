@@ -11,6 +11,7 @@ users.post('/auth', userAuth.login);
 users.post('/forget_password', userAuth.forgetPassword);
 users.post('/register', userAuth.signup);
 users.post('/contact_us', validate({ body: userSchema }), userAuth.contactUs);
+users.post('/reset_password/:token', userAuth.resetPassword);
 
 // users.use(verifyJWT);
 

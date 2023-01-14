@@ -110,7 +110,18 @@ const forgetPassword = async (req, res) => {
       message: `User doesn't exist`,
     });
   }
+
+  const resetPass = jwt.sign(
+    {
+      UserInfo: {
+        email: foundUser.email,
+      },
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: '5m' }
+  );
   foundUser.password = crypto.randomBytes(32).toString('hex');
+  foundUser.password = await bcrypt.hash(foundUser.password, 10);
   const result = await foundUser.save();
 
   console.log(result);
@@ -123,12 +134,38 @@ const forgetPassword = async (req, res) => {
     to: email,
     subject: 'test Email',
     text: 'For clients with plaintext support only',
-    html: forgetPassHtml,
+    html: forgetPassHtml(resetPass),
   };
 
   await sendEmail(mailOptions);
 
   return res.sendStatus(200);
+};
+
+const resetPassword = async (req, res) => {
+  const token = req.params.token;
+  const { password } = req.body;
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, decoded) => {
+    if (err) return res.sendStatus(403); //invalid token
+    const email = decoded.UserInfo.email;
+    const foundUser = await User.findOne({
+      email: email,
+    }).exec();
+
+    if (!foundUser) {
+      return res.status(404).json({
+        success: false,
+        message: `User doesn't exist`,
+      });
+    }
+
+    foundUser.password = await bcrypt.hash(password, 10);
+    const result = await foundUser.save();
+
+    console.log(result);
+    return res.sendStatus(200);
+  });
 };
 
 const signup = async (req, res) => {
@@ -236,4 +273,5 @@ module.exports = {
   forgetPassword,
   refreshToken,
   contactUs,
+  resetPassword,
 };

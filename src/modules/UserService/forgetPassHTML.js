@@ -1,4 +1,5 @@
-const forgetPass = `
+const forgetPass = (path) => {
+  return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,7 +18,7 @@ const forgetPass = `
       div {
           margin: 20px;
       }
-      button {
+      .button {
           border: none;
           background: #65abfc;
           font-size: 17px;
@@ -42,7 +43,8 @@ const forgetPass = `
 
   <p>To reset your password, visit the following address:</p>
 
-  <button>Click here to reset your password</button>
+  <a type="button" class="button" href='https://localhost:3000/${path}'>Click here to reset your password"</a>
+<!--  <button>Click here to reset your password</button>-->
 
   <p>
     If you didn't request a password reset, you can ignore this email. Your
@@ -56,5 +58,6 @@ const forgetPass = `
 </body>
 </html>
 `;
+};
 
 module.exports = forgetPass;
