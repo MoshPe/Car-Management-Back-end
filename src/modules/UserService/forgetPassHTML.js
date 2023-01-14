@@ -10,6 +10,7 @@ const forgetPass = (path) => {
   <style>
       body {
           font-family: Arial, Helvetica, sans-serif;
+          direction: ltr;
           margin: 20px;
       }
       h2 {
