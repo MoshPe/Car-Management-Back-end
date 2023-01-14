@@ -34,7 +34,7 @@ const forgetPass = (path) => {
       }
   </style>
 </head>
-<body>
+<body dir="ltr">
 <h1>Car Managment</h1>
 <h2>Reset Password</h2>
 <div>
