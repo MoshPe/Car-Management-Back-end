@@ -12,6 +12,7 @@ const forgetPass = (path) => {
           font-family: Arial, Helvetica, sans-serif;
           direction: ltr;
           margin: 20px;
+          color: black;
       }
       h2 {
           padding: 0px 20px;
@@ -29,7 +30,7 @@ const forgetPass = (path) => {
           border-radius: 10px;
           cursor: pointer;
       }
-      button:hover {
+      .button:hover {
           background: #4496f5;
       }
   </style>
