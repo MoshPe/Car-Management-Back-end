@@ -49,7 +49,7 @@ const forgetPass = (path) => {
 
   <a type="button" class="button" href='https://localhost:3000/${path}'>Click here to reset your password</a>
 <!--  <button>Click here to reset your password</button>-->
-
+  <p> This link is available for 5 minuntes only! </p>
   <p>
     If you didn't request a password reset, you can ignore this email. Your
     password will not be changed.
