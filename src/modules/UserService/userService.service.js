@@ -7,8 +7,8 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../../models/user');
 const crypto = require('crypto');
-const transporter = require('../mail/transporter');
-const nodemailer = require('nodemailer');
+const sendEmail = require('../mail/transporter');
+const forgetPassHtml = require('./forgetPassHTML');
 
 const login = async (req, res) => {
   let { email, password } = req.body;
@@ -115,30 +115,6 @@ const forgetPassword = async (req, res) => {
 
   console.log(result);
 
-  const transporter = nodemailer.createTransport({
-    port: 465,
-    service: 'gmail',
-    host: 'smtp.gmail.com',
-    auth: {
-      user: 'moshe.peretz318@gmail.com',
-      pass: process.env.SMTP_PASSWORD,
-    },
-    secure: true,
-  });
-
-  await new Promise((resolve, reject) => {
-    // verify connection configuration
-    transporter.verify(function (error, success) {
-      if (error) {
-        console.log(error);
-        reject(error);
-      } else {
-        console.log('Server is ready to take our messages');
-        resolve(success);
-      }
-    });
-  });
-
   const mailOptions = {
     from: {
       name: `Car-Management Service - Reset password`,
@@ -147,69 +123,10 @@ const forgetPassword = async (req, res) => {
     to: email,
     subject: 'test Email',
     text: 'For clients with plaintext support only',
-    html: `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>
-        </title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <style>
-        body {background-color:#ffffff;background-repeat:no-repeat;background-position:top left;background-attachment:fixed;}
-        h1{font-family:Arial, sans-serif;color:#000000;background-color:#ffffff;}
-        p {font-family:Georgia, serif;font-size:14px;font-style:normal;font-weight:normal;color:#000000;background-color:#ffffff;}
-        .button {
-          border: none;
-          color: white;
-          padding: 16px 32px;
-          text-align: center;
-          text-decoration: none;
-          display: inline-block;
-          font-size: 16px;
-          margin: 4px 2px;
-          transition-duration: 0.4s;
-          cursor: pointer;
-        }
-        
-        .button1 {
-          background-color: white; 
-          color: black; 
-          border: 2px solid #4CAF50;
-        }
-        
-        .button1:hover {
-          background-color: #4CAF50;
-          color: white;
-        }
-        </style>
-      </head>
-      <body>
-        <h1>Reset Password - Car Management Service</h1>
-        <p></p>
-        <p>Hey there,</p>
-        <p></p>
-        <p>Someone requested a new password for your [customer portal] account.</p>
-        <p></p>
-        <button class="button button1">reset password</button>
-        <p></p>
-        <p>If you didn’t make this request, then you can ignore this email 🙂</p>
-      </body>
-    </html>
-  `,
+    html: forgetPassHtml,
   };
 
-  await new Promise((resolve, reject) => {
-    // send mail
-    transporter.sendMail(mailOptions, (err, info) => {
-      if (err) {
-        console.error(err);
-        reject(err);
-      } else {
-        console.log(info);
-        resolve(info);
-      }
-    });
-  });
+  await sendEmail(mailOptions);
 
   return res.sendStatus(200);
 };
@@ -254,6 +171,31 @@ const signup = async (req, res) => {
   }
 };
 
+const contactUs = async (req, res) => {
+  const contactInfo = req.body;
+  if (!contactInfo) {
+    return res.status(400).json({
+      success: false,
+      message: 'You must provide contact info',
+    });
+  }
+  const email = contactInfo.email;
+
+  const mailOptions = {
+    from: {
+      name: `Contact us - from ${email}`,
+      address: 'moshe.peretz318@gmail.com',
+    },
+    to: 'moshe.peretz318@gmail.com',
+    subject: `Contact us - from ${email} - ${contactInfo.name} - ${contactInfo?.subject}`,
+    text: contactInfo?.body,
+  };
+
+  await sendEmail(mailOptions);
+
+  return res.sendStatus(200);
+};
+
 const refreshToken = async (req, res) => {
   const cookies = req.cookies;
   if (!cookies?.jwt) return res.sendStatus(401);
@@ -293,4 +235,5 @@ module.exports = {
   logout,
   forgetPassword,
   refreshToken,
+  contactUs,
 };

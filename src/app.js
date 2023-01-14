@@ -13,6 +13,7 @@ const verifyJWT = require('./middleware/verifyJWT');
 const connectDB = require('./modules/database/mongodb');
 const { connection } = require('mongoose');
 const mongoose = require('mongoose');
+const validationErrorMiddleware = require("./middleware/validationError");
 
 const app = express();
 app.set('port', process.env.PORT || 4000);
@@ -25,6 +26,7 @@ app.use(credentials);
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors(corsOptions));
+app.use(express.json());
 app.use(helmet());
 app.use(cookieParser());
 app.use(
@@ -47,6 +49,8 @@ app.use('/api', require('./api/refresh'));
 
 // app.use(verifyJWT);
 app.use('/api', require('./api/treatments'));
+
+app.use(validationErrorMiddleware);
 connection.once('open', () => {
   console.log('Connected to MongoDB');
   app.listen(app.get('port'), () => {
