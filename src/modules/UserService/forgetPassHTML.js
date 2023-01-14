@@ -19,6 +19,7 @@ const forgetPass = (path) => {
           margin: 20px;
       }
       .button {
+          text-decoration: none;
           border: none;
           background: #65abfc;
           font-size: 17px;
@@ -43,7 +44,7 @@ const forgetPass = (path) => {
 
   <p>To reset your password, visit the following address:</p>
 
-  <a type="button" class="button" href='https://localhost:3000/${path}'>Click here to reset your password"</a>
+  <a type="button" class="button" href='https://localhost:3000/${path}'>Click here to reset your password</a>
 <!--  <button>Click here to reset your password</button>-->
 
   <p>
