@@ -47,7 +47,7 @@ app.use(
 app.use('/api', require('./api/users'));
 app.use('/api', require('./api/refresh'));
 
-// app.use(verifyJWT);
+app.use(verifyJWT);
 app.use('/api', require('./api/treatments'));
 
 app.use(validationErrorMiddleware);

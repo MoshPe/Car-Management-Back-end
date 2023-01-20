@@ -38,7 +38,7 @@ const login = async (req, res) => {
         },
       },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: '1h' }
+      { expiresIn: '5m' }
     );
     const refreshToken = jwt.sign(
       { email: foundUser.email },
@@ -48,7 +48,7 @@ const login = async (req, res) => {
     foundUser.refreshToken = refreshToken;
     const result = await foundUser.save();
 
-    console.log(result);
+    // console.log(result);
 
     //Expire in one day in ms
     res.cookie('jwt', refreshToken, {
@@ -57,6 +57,9 @@ const login = async (req, res) => {
       sameSite: 'None',
       maxAge: 24 * 60 * 60 * 1000,
     });
+
+    delete foundUser.refreshToken;
+
     res.status(200).json({
       success: true,
       message: 'Successfully authenticated',
@@ -72,7 +75,8 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
   const cookies = req.cookies;
-  // if (!cookies?.jwt) return res.sendStatus(204); //No content
+  debugger
+  if (!cookies?.jwt) return res.sendStatus(204); //No content
   const refreshToken = cookies.jwt;
 
   const foundUser = await User.findOne({ refreshToken }).exec();
@@ -243,6 +247,7 @@ const contactUs = async (req, res) => {
 
 const refreshToken = async (req, res) => {
   const cookies = req.cookies;
+  console.log(`cookies: ${cookies}`);
   if (!cookies?.jwt) return res.sendStatus(401);
   const refreshToken = cookies.jwt;
 
@@ -268,7 +273,7 @@ const refreshToken = async (req, res) => {
         },
       },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: '10s' }
+      { expiresIn: '5m' }
     );
     res.json({ accessToken });
   });

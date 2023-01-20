@@ -13,8 +13,6 @@ users.post('/register', userAuth.signup);
 users.post('/contact_us', validate({ body: userSchema }), userAuth.contactUs);
 users.post('/reset_password/:token', userAuth.resetPassword);
 
-// users.use(verifyJWT);
-
 users.get('/logout', userAuth.logout);
 
 module.exports = users;

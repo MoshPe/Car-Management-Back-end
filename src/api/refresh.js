@@ -3,6 +3,6 @@ const userAuth = require('../modules/UserService/userService.service');
 
 const refresh = express.Router();
 
-refresh.post('/refresh', userAuth.refreshToken);
+refresh.get('/refresh', userAuth.refreshToken);
 
 module.exports = refresh;
