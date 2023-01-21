@@ -15,10 +15,10 @@
   },
   "servers": [
     {
-      "url": "http://localhost:4000/api",
+      "url": "http://localhost:4000/api"
     },
     {
-      "url": "https://car-management-back-end.vercel.app/api",
+      "url": "https://car-management-back-end.vercel.app/api"
     }
   ],
   "tags": [
