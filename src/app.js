@@ -17,6 +17,7 @@ const validationErrorMiddleware = require('./middleware/validationError');
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const options = require('./swagger/swagger_options');
+const path = require('path')
 
 const app = express();
 app.set('port', process.env.PORT || 4000);
@@ -58,7 +59,7 @@ app.use(verifyJWT);
 app.use('/api', require('./api/treatments'));
 
 app.use(validationErrorMiddleware);
-app.use(express.static(__dirname));
+app.use(express.static(path.resolve(__dirname, '..')));
 
 connection.once('open', () => {
   console.log('Connected to MongoDB');
