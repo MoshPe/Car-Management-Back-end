@@ -25,7 +25,7 @@ app.set('port', process.env.PORT || 4000);
 mongoose.set('strictQuery', true);
 connectDB();
 
-app.use('/public', express.static(path.join(__dirname, '/public')));
+app.use('/api-swagger', express.static(path.join(__dirname, '/public')));
 app.use(responseTime());
 app.use(credentials);
 app.use(bodyParser.json({ limit: '10mb' }));
