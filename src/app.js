@@ -37,7 +37,6 @@ app.use(
   swaggerUi.serve,
   swaggerUi.setup(swaggerJsdoc(options), { explorer: true })
 );
-app.use(helmet());
 app.use(cookieParser());
 app.use(
   expressWinston.logger({
