@@ -16,7 +16,7 @@ const mongoose = require('mongoose');
 const validationErrorMiddleware = require('./middleware/validationError');
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-const options = require('./swagger/swagger_options');
+const options = require('./swagger/swagger.json');
 const path = require('path');
 
 const app = express();
@@ -25,6 +25,11 @@ app.set('port', process.env.PORT || 4000);
 mongoose.set('strictQuery', true);
 connectDB();
 
+const optionsUI = {
+  customCssUrl: '/api-swagger/swagger-ui.css',
+  customSiteTitle: 'Car-Management-Service Backend API - Swagger Documentation',
+  explorer: true,
+};
 app.use('/api-swagger', express.static(path.join(__dirname, '/public')));
 app.use(responseTime());
 app.use(credentials);
@@ -32,11 +37,7 @@ app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 app.use(express.json());
-app.use(
-  '/api-swagger',
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerJsdoc(options), { explorer: true })
-);
+app.use('/api-swagger', swaggerUi.serve, swaggerUi.setup(options, optionsUI));
 app.use(cookieParser());
 app.use(
   expressWinston.logger({
