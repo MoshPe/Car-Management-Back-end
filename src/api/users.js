@@ -1,6 +1,5 @@
 const express = require('express');
 const userAuth = require('../modules/UserService/userService.service');
-const verifyJWT = require('../middleware/verifyJWT');
 const { Validator } = require('express-json-validator-middleware');
 const userSchema = require('../models/contactBodySchema');
 const { validate } = new Validator();

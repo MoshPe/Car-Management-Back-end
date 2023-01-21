@@ -20,9 +20,4 @@ const UserSchema = new mongoose.Schema(
   }
 );
 
-// UserSchema.pre('save', (next) => {
-//   this.Treatment_Number = this._id;
-//   next();
-// });
-
 module.exports = mongoose.model('User', UserSchema, 'users');

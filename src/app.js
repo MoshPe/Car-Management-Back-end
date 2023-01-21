@@ -13,7 +13,10 @@ const verifyJWT = require('./middleware/verifyJWT');
 const connectDB = require('./modules/database/mongodb');
 const { connection } = require('mongoose');
 const mongoose = require('mongoose');
-const validationErrorMiddleware = require("./middleware/validationError");
+const validationErrorMiddleware = require('./middleware/validationError');
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+const options = require('./swagger/swagger_options');
 
 const app = express();
 app.set('port', process.env.PORT || 4000);
@@ -43,7 +46,11 @@ app.use(
   })
 );
 
-// app.use('/api/auth', require('./api/auth'));
+app.use(
+  '/api-swagger',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerJsdoc(options), { explorer: true })
+);
 app.use('/api', require('./api/users'));
 app.use('/api', require('./api/refresh'));
 
@@ -51,9 +58,13 @@ app.use(verifyJWT);
 app.use('/api', require('./api/treatments'));
 
 app.use(validationErrorMiddleware);
+
 connection.once('open', () => {
   console.log('Connected to MongoDB');
   app.listen(app.get('port'), () => {
     console.log(`App listening on ${app.get('port')}`);
+    console.log(
+      `Swagger is up on http://localhost:${app.get('port')}/api-swagger/`
+    );
   });
 });
