@@ -23,6 +23,7 @@ const options = {
       },
     ],
   },
+  customCssUrl: '/public/swagger-ui.css',
   apis: ['./src/api/*.js'],
 };
 
