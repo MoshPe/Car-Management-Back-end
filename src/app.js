@@ -25,11 +25,11 @@ app.set('port', process.env.PORT || 4000);
 mongoose.set('strictQuery', true);
 connectDB();
 
-app.use(express.static(path.resolve(__dirname, '..')));
+app.use(express.static(path.join(__dirname, '/public')));
 app.use(responseTime());
 app.use(credentials);
 app.use(bodyParser.json({ limit: '10mb' }));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(
@@ -51,7 +51,6 @@ app.use(
     },
   })
 );
-
 
 app.use('/api', require('./api/users'));
 app.use('/api', require('./api/refresh'));
