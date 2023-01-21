@@ -25,12 +25,18 @@ app.set('port', process.env.PORT || 4000);
 mongoose.set('strictQuery', true);
 connectDB();
 
+app.use(express.static(path.resolve(__dirname, '..')));
 app.use(responseTime());
 app.use(credentials);
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(
+  '/api-swagger',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerJsdoc(options), { explorer: true })
+);
 app.use(helmet());
 app.use(cookieParser());
 app.use(
@@ -47,11 +53,7 @@ app.use(
   })
 );
 
-app.use(
-  '/api-swagger',
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerJsdoc(options), { explorer: true })
-);
+
 app.use('/api', require('./api/users'));
 app.use('/api', require('./api/refresh'));
 
@@ -59,7 +61,6 @@ app.use(verifyJWT);
 app.use('/api', require('./api/treatments'));
 
 app.use(validationErrorMiddleware);
-app.use(express.static(path.resolve(__dirname, '..')));
 
 connection.once('open', () => {
   console.log('Connected to MongoDB');
