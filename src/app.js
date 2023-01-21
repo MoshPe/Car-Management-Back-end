@@ -17,7 +17,7 @@ const validationErrorMiddleware = require('./middleware/validationError');
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const options = require('./swagger/swagger_options');
-const path = require('path')
+const path = require('path');
 
 const app = express();
 app.set('port', process.env.PORT || 4000);
@@ -25,7 +25,7 @@ app.set('port', process.env.PORT || 4000);
 mongoose.set('strictQuery', true);
 connectDB();
 
-app.use(express.static(path.join(__dirname, '/public')));
+app.use('/public', express.static(path.join(__dirname, '/public')));
 app.use(responseTime());
 app.use(credentials);
 app.use(bodyParser.json({ limit: '10mb' }));
