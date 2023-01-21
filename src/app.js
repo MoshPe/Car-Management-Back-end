@@ -58,6 +58,7 @@ app.use(verifyJWT);
 app.use('/api', require('./api/treatments'));
 
 app.use(validationErrorMiddleware);
+app.use(express.static(__dirname));
 
 connection.once('open', () => {
   console.log('Connected to MongoDB');
