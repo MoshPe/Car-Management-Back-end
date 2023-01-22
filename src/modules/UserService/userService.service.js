@@ -9,6 +9,7 @@ const User = require('../../models/user');
 const crypto = require('crypto');
 const sendEmail = require('../mail/transporter');
 const forgetPassHtml = require('./forgetPassHTML');
+const axios = require('axios');
 
 const login = async (req, res) => {
   let { email, password } = req.body;
@@ -73,9 +74,35 @@ const login = async (req, res) => {
     });
 };
 
+const recapcha = async (req, res) => {
+  const { token } = req.body;
+  if (!token) {
+    return res.status(400).json({
+      success: false,
+      message: 'You must provide a user token score',
+    });
+  }
+
+  const response = await axios.post(
+    `https://www.google.com/recaptcha/api/siteverify`,
+    {
+      params: {
+        secret: process.env.RECAPTCHA_SECRET_KEY,
+        response: token,
+      },
+    }
+  );
+
+  if (response.status === 200) {
+    res.sendStatus(200);
+  } else {
+    res.sendStatus(401);
+  }
+};
+
 const logout = async (req, res) => {
   const cookies = req.cookies;
-  debugger
+  debugger;
   if (!cookies?.jwt) return res.sendStatus(204); //No content
   const refreshToken = cookies.jwt;
 
@@ -287,4 +314,5 @@ module.exports = {
   refreshToken,
   contactUs,
   resetPassword,
+  recapcha,
 };

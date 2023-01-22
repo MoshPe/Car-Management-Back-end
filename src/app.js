@@ -36,6 +36,7 @@ app.use(credentials);
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
+app.use(helmet());
 app.use(express.json());
 app.use('/api-swagger', swaggerUi.serve, swaggerUi.setup(options, optionsUI));
 app.use(cookieParser());
