@@ -12,6 +12,7 @@ Express runs on port `4000`.
    - `SMTP_PORT`
    - `SMTP_USERNAME`
    - `SMTP_PASSWORD`
+   - `RECAPTCHA_SECRET_KEY`
 3. Run `npm run dev`.
 
 ## Deployment
