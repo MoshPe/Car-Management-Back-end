@@ -22,10 +22,10 @@ The frontend repo can be found here [TalChenBE/Car-Managment](https://github.com
 This git repo is connected to a vercel account that associated with MoshPe/Car-Management-Back-end github repo.
 Vercel domain: [Car-Management-Service-Back-end](https://car-management-back-end.vercel.app/api/).
 
-#*NOTE!*
+# *NOTE!*
 **!!!The backend requires authentication using JWT so in order to use the service, login is required.!!!**
 
-##Swagger
+## Swagger
 swagger will be up and running on:
 - Local: http://localhost:4000/api-swagger
 - vercel domain: https://car-management-back-end.vercel.app/api-swagger
