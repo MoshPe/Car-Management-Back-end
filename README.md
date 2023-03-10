@@ -1,6 +1,9 @@
 # Car-Management-Service Backend
-This is a backend service for Car-Management-Service web app.
-Express runs on port `4000`.
+The car management backend service allows car owners to manage their vehicles' maintenance, repairs, and other related activities. It is built using Node.js, Express, and MongoDB and deployed on Vercel. The backend is integrated with Atlas MongoDB, which is a fully managed cloud database service, to ensure secure and scalable data storage.
+
+The system incorporates a comprehensive authentication and authorization mechanism that enables users to sign up, log in, and securely access the app's functionalities. It uses JSON Web Tokens (JWT) to authenticate users and ensure that only authorized users can access the app's resources. The JWT tokens are encrypted, ensuring that sensitive user information remains secure.
+
+Finally, the backend service is deployed on Vercel, which is a serverless cloud platform. Vercel's global edge network ensures that the app is fast and responsive, even during periods of high traffic. Additionally, Vercel's security features, including DDoS protection and HTTPS encryption, ensure that the app and user data remain secure at all times.
 
 ## First Use:
 1. Run `npm install` to install all the dependencies.
